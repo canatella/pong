@@ -46,11 +46,11 @@ class Pong < Gosu::Window
   end
 
   class Balle
-    attr_reader(:x, :y, :diametre, :sens)
+    attr_reader(:x, :y, :diametre, :sens, :angle)
 
     def initialize
       @diametre = 10
-      @sens = 1
+      @angle = 0.5
       @x = (Pong::LARGEUR_FENETRE - @diametre) / 2
       @y = (Pong::LONGUEUR_FENETRE - @diametre) / 2
     end
@@ -60,21 +60,34 @@ class Pong < Gosu::Window
     end
 
     def avance
-      @x = @x + @sens * Pong::VITESSE_BALLE
+      @x = @x + Math.cos(@angle) * Pong::VITESSE_BALLE
+      @y = @y + Math.sin(@angle) * Pong::VITESSE_BALLE
     end
 
-    def change_sens
-      @sens = 0 - @sens
+    def sens
+      Math.cos(@angle) / Math.cos(@angle).abs
+    end
+
+    def change_sens_x
+      @angle = Math::PI - @angle
+    end
+
+    def change_sens_y
+      @angle *= -1
+    end
+
+    def touche_mur_y?
+      return @y <= 0 || @y + @diametre >= Pong::LONGUEUR_FENETRE
     end
   end
 
   def initialize
     super(Pong::LARGEUR_FENETRE, Pong::LONGUEUR_FENETRE)
     self.caption = "Pong!!!"
-    commencer 
-  end 
-  
-  def commencer 
+    commencer
+  end
+
+  def commencer
     @joueur1 = Joueur.new(Pong::ESPACE_JOUEUR)
     @joueur2 = Joueur.new(Pong::LARGEUR_FENETRE - Pong::ESPACE_JOUEUR - Pong::LARGEUR_JOUEUR)
     @balle = Balle.new
@@ -109,7 +122,10 @@ class Pong < Gosu::Window
   def update
     @balle.avance
     if touche_balle?(@balle, @joueur2) || touche_balle?(@balle, @joueur1)
-      @balle.change_sens
+      @balle.change_sens_x
+    end
+    if @balle.touche_mur_y?
+      @balle.change_sens_y
     end
   end
 
@@ -122,7 +138,7 @@ class Pong < Gosu::Window
   def button_up(bouton)
     if bouton == Gosu::KB_Q
       @joueur1.monte
-    elsif bouton == Gosu::KB_A 
+    elsif bouton == Gosu::KB_A
       @joueur1.descent
     elsif bouton == Gosu::KB_UP
       @joueur2.monte
