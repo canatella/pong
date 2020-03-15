@@ -6,7 +6,9 @@ class Pong < Gosu::Window
   LARGEUR_JOUEUR = 10
   LONGUEUR_JOUEUR = 40
   ESPACE_JOUEUR = 10
+  VITESSE_JOUEUR = 5
   VITESSE_BALLE = 1
+
 
   class Joueur
     def initialize(x)
@@ -37,11 +39,11 @@ class Pong < Gosu::Window
     end
 
     def monte
-      @y = @y - 20
+      @y = @y - Pong::VITESSE_JOUEUR
     end
 
     def descent
-      @y = @y + 20
+      @y = @y + Pong::VITESSE_JOUEUR
     end
   end
 
@@ -74,7 +76,7 @@ class Pong < Gosu::Window
     end
 
     def avance
-      @x = @x + Math.cos(@angle) * @vitesse  
+      @x = @x + Math.cos(@angle) * @vitesse
       @y = @y + Math.sin(@angle) * @vitesse
     end
 
@@ -83,7 +85,7 @@ class Pong < Gosu::Window
     end
 
     def change_sens_x
-      @vitesse += 1 
+      @vitesse += 1
       @angle = Math::PI - @angle
     end
 
@@ -133,11 +135,21 @@ class Pong < Gosu::Window
       else
         commencer
       end
-      
+
     end
   end
 
   def update
+    if button_down?(Gosu::KB_Q)
+      @joueur1.monte
+    elsif button_down?(Gosu::KB_A)
+      @joueur1.descent
+    elsif button_down?(Gosu::KB_UP)
+      @joueur2.monte
+    elsif button_down?(Gosu::KB_DOWN)
+      @joueur2.descent
+    end
+
     @balle.avance
     if touche_balle?(@balle, @joueur2) || touche_balle?(@balle, @joueur1)
       @balle.change_sens_x
@@ -154,15 +166,7 @@ class Pong < Gosu::Window
   end
 
   def button_up(bouton)
-    if bouton == Gosu::KB_Q
-      @joueur1.monte
-    elsif bouton == Gosu::KB_A
-      @joueur1.descent
-    elsif bouton == Gosu::KB_UP
-      @joueur2.monte
-    elsif bouton == Gosu::KB_DOWN
-      @joueur2.descent
-    elsif bouton == Gosu::KB_ESCAPE
+    if bouton == Gosu::KB_ESCAPE
       exit
     elsif bouton == Gosu::KB_R
       commencer
