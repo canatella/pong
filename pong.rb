@@ -50,9 +50,22 @@ class Pong < Gosu::Window
 
     def initialize
       @diametre = 10
-      @angle = 0.5
+      @angle = angle_initial
       @x = (Pong::LARGEUR_FENETRE - @diametre) / 2
       @y = (Pong::LONGUEUR_FENETRE - @diametre) / 2
+    end
+
+    def angle_initial
+      angle = Random.rand(Math::PI / 6) + Math::PI / 12
+      cadran =  Random.rand(4)
+      if cadran > 3
+        angle = Math::PI - angle
+      elsif cadran > 2
+        angle = Math::PI + angle
+      elsif cadran > 1
+        angle *= -1
+      end
+      angle
     end
 
     def draw
