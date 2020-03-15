@@ -71,6 +71,10 @@ class Pong < Gosu::Window
   def initialize
     super(Pong::LARGEUR_FENETRE, Pong::LONGUEUR_FENETRE)
     self.caption = "Pong!!!"
+    commencer 
+  end 
+  
+  def commencer 
     @joueur1 = Joueur.new(Pong::ESPACE_JOUEUR)
     @joueur2 = Joueur.new(Pong::LARGEUR_FENETRE - Pong::ESPACE_JOUEUR - Pong::LARGEUR_JOUEUR)
     @balle = Balle.new
@@ -116,12 +120,18 @@ class Pong < Gosu::Window
   end
 
   def button_up(bouton)
-    if bouton == Gosu::KB_UP
+    if bouton == Gosu::KB_Q
       @joueur1.monte
-    elsif bouton == Gosu::KB_DOWN
+    elsif bouton == Gosu::KB_A 
       @joueur1.descent
+    elsif bouton == Gosu::KB_UP
+      @joueur2.monte
+    elsif bouton == Gosu::KB_DOWN
+      @joueur2.descent
     elsif bouton == Gosu::KB_ESCAPE
       exit
+    elsif bouton == Gosu::KB_R
+      commencer
     end
   end
 
