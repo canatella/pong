@@ -6,7 +6,7 @@ class Pong < Gosu::Window
   LARGEUR_JOUEUR = 10
   LONGUEUR_JOUEUR = 40
   ESPACE_JOUEUR = 10
-  VITESSE_BALLE = 3
+  VITESSE_BALLE = 1
 
   class Joueur
     def initialize(x)
@@ -37,11 +37,11 @@ class Pong < Gosu::Window
     end
 
     def monte
-      @y = @y - 5
+      @y = @y - 20
     end
 
     def descent
-      @y = @y + 5
+      @y = @y + 20
     end
   end
 
@@ -53,6 +53,7 @@ class Pong < Gosu::Window
       @angle = angle_initial
       @x = (Pong::LARGEUR_FENETRE - @diametre) / 2
       @y = (Pong::LONGUEUR_FENETRE - @diametre) / 2
+      @vitesse = Pong::VITESSE_BALLE
     end
 
     def angle_initial
@@ -73,8 +74,8 @@ class Pong < Gosu::Window
     end
 
     def avance
-      @x = @x + Math.cos(@angle) * Pong::VITESSE_BALLE
-      @y = @y + Math.sin(@angle) * Pong::VITESSE_BALLE
+      @x = @x + Math.cos(@angle) * @vitesse  
+      @y = @y + Math.sin(@angle) * @vitesse
     end
 
     def sens
@@ -82,6 +83,7 @@ class Pong < Gosu::Window
     end
 
     def change_sens_x
+      @vitesse += 1 
       @angle = Math::PI - @angle
     end
 
@@ -125,10 +127,13 @@ class Pong < Gosu::Window
   end
 
   def touche_balle?(balle, joueur)
-    if touche_balle_x?(balle, joueur) && touche_balle_y?(balle, joueur)
-      true
-    else
-      false
+    if touche_balle_x?(balle, joueur)
+      if touche_balle_y?(balle, joueur)
+        true
+      else
+        commencer
+      end
+      
     end
   end
 
