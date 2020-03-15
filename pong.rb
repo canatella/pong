@@ -4,27 +4,10 @@ class Pong < Gosu::Window
   LARGEUR_FENETRE = 640
   LONGUEUR_FENETRE = 480
   LARGEUR_JOUEUR = 10
-  LONGUEUR_JOUEUR = 40
+  LONGUEUR_JOUEUR = 60
   ESPACE_JOUEUR = 10
   VITESSE_JOUEUR = 5
-  VITESSE_BALLE = 1
-
-
-  class Joueur
-    def initialize(x)
-      @longueur = Pong::LONGUEUR_JOUEUR
-      @largeur = Pong::LARGEUR_JOUEUR
-      @x = x
-      @y = (Pong::LONGUEUR_FENETRE - @longueur) / 2
-    end
-
-    def largeur
-      @largeur
-    end
-
-    def x
-      @x
-    end
+  VITESSE_BALLE = 2
 
     def y
       @y
@@ -85,8 +68,8 @@ class Pong < Gosu::Window
     end
 
     def change_sens_x
-      @vitesse += 1
-      @angle = Math::PI - @angle
+      @vitesse += 0.75
+      @angle = Math::PI - @angle + Random.rand(Math::PI/6) - Math::PI/12
     end
 
     def change_sens_y
@@ -144,9 +127,10 @@ class Pong < Gosu::Window
       @joueur1.monte
     elsif button_down?(Gosu::KB_A)
       @joueur1.descent
-    elsif button_down?(Gosu::KB_UP)
+    end
+    if button_down?(Gosu::KB_O)
       @joueur2.monte
-    elsif button_down?(Gosu::KB_DOWN)
+    elsif button_down?(Gosu::KB_L)
       @joueur2.descent
     end
 
