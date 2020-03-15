@@ -35,6 +35,14 @@ class Pong < Gosu::Window
     def droite?
       @x > Pong::LARGEUR_FENETRE / 2
     end
+
+    def monte
+      @y = @y - 5
+    end
+
+    def descent
+      @y = @y + 5
+    end
   end
 
   class Balle
@@ -68,10 +76,26 @@ class Pong < Gosu::Window
     @balle = Balle.new
   end
 
-  def touche_balle?(balle, joueur)
+  def touche_balle_x?(balle, joueur)
     if joueur.droite? && balle.x >= joueur.x - (balle.sens * balle.diametre)
       true
     elsif !joueur.droite? && balle.x <= joueur.x - (balle.sens * balle.diametre)
+      true
+    else
+      false
+    end
+  end
+
+  def touche_balle_y?(balle, joueur)
+    if balle.y + balle.diametre >= joueur.y && joueur.y + Pong::LONGUEUR_JOUEUR >= balle.y
+      true
+    else
+      false
+    end
+  end
+
+  def touche_balle?(balle, joueur)
+    if touche_balle_x?(balle, joueur) && touche_balle_y?(balle, joueur)
       true
     else
       false
@@ -90,6 +114,18 @@ class Pong < Gosu::Window
     @joueur2.draw
     @balle.draw
   end
+
+  def button_up(bouton)
+    if bouton == Gosu::KB_UP
+      @joueur1.monte
+    elsif bouton == Gosu::KB_DOWN
+      @joueur1.descent
+    elsif bouton == Gosu::KB_ESCAPE
+      exit
+    end
+  end
+
+
 end
 
 Pong.new.show
