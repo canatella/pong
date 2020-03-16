@@ -9,6 +9,67 @@ class Pong < Gosu::Window
   VITESSE_JOUEUR = 5
   VITESSE_BALLE = 2
 
+  class Score
+    PIXEL = 10
+    CHIFFRES = <<-EOF
+XXXX   XX XXXX XXXX   X  XXXX XXXX XXXX XXXX XXXX
+X  X  X X    X    X  XX  X    X       X X  X X  X
+X  X    X XXXX XXXX X X  XXXX XXXX   X  XXXX XXXX
+X  X    X X       X XXXX    X X  X  X   X  X    X
+XXXX    X XXXX XXXX   X  XXXX XXXX  X   XXXX XXXX
+EOF
+
+    def initialize
+      @score_gauche = 0
+      @score_droite = 0
+    end
+
+    def récupère_chiffre(chiffre)
+      CHIFFRES.each_line.map do |ligne|
+        ligne[(chiffre % 10) * 5, 4]
+      end.join("\n")
+    end
+    def affiche_score(chiffre, x)
+      masque = récupère_chiffre(chiffre)
+      masque.each_line.with_index do |ligne, i|
+        ligne.each_char.with_index do |c, j|
+          next if c != 'X'
+          Gosu.draw_rect(x + j * PIXEL, 10 + i * PIXEL, PIXEL, PIXEL, Gosu::Color::RED)
+        end
+      end
+      Gosu.draw_rect(Pong::LARGEUR_FENETRE / 2 - 2, 10, 4, PIXEL * 5, Gosu::Color::RED)
+    end
+
+    def ajoute_manche(joueur)
+      if joueur.droite?
+        @score_droite += 1
+      else
+        @score_gauche += 1
+      end
+    end
+
+    def draw
+      affiche_score(@score_gauche, Pong::LARGEUR_FENETRE / 2 - 6 * PIXEL)
+      affiche_score(@score_droite, Pong::LARGEUR_FENETRE / 2 + 2 * PIXEL)
+    end
+  end
+
+  class Joueur
+    def initialize(x)
+      @longueur = Pong::LONGUEUR_JOUEUR
+      @largeur = Pong::LARGEUR_JOUEUR
+      @x = x
+      @y = (Pong::LONGUEUR_FENETRE - @longueur) / 2
+    end
+
+    def largeur
+      @largeur
+    end
+
+    def x
+      @x
+    end
+
     def y
       @y
     end
@@ -44,11 +105,11 @@ class Pong < Gosu::Window
     def angle_initial
       angle = Random.rand(Math::PI / 6) + Math::PI / 12
       cadran =  Random.rand(4)
-      if cadran > 3
+      if cadran == 3
         angle = Math::PI - angle
-      elsif cadran > 2
+      elsif cadran == 2
         angle = Math::PI + angle
-      elsif cadran > 1
+      elsif cadran == 1
         angle *= -1
       end
       angle
@@ -84,6 +145,7 @@ class Pong < Gosu::Window
   def initialize
     super(Pong::LARGEUR_FENETRE, Pong::LONGUEUR_FENETRE)
     self.caption = "Pong!!!"
+    @score = Score.new
     commencer
   end
 
@@ -91,6 +153,15 @@ class Pong < Gosu::Window
     @joueur1 = Joueur.new(Pong::ESPACE_JOUEUR)
     @joueur2 = Joueur.new(Pong::LARGEUR_FENETRE - Pong::ESPACE_JOUEUR - Pong::LARGEUR_JOUEUR)
     @balle = Balle.new
+  end
+
+  def perdu!
+    if @balle.sens > 0
+      @score.ajoute_manche(@joueur1)
+    else
+      @score.ajoute_manche(@joueur2)
+    end
+    commencer
   end
 
   def touche_balle_x?(balle, joueur)
@@ -116,7 +187,7 @@ class Pong < Gosu::Window
       if touche_balle_y?(balle, joueur)
         true
       else
-        commencer
+        perdu!
       end
 
     end
@@ -144,6 +215,7 @@ class Pong < Gosu::Window
   end
 
   def draw
+    @score.draw
     @joueur1.draw
     @joueur2.draw
     @balle.draw
@@ -154,10 +226,13 @@ class Pong < Gosu::Window
       exit
     elsif bouton == Gosu::KB_R
       commencer
+    elsif bouton == Gosu::KB_Z
+      @score = Score.new
+      commencer
     end
   end
-
-
 end
+
+require_relative "score.rb"
 
 Pong.new.show
